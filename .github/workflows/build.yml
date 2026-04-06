@@ -25,7 +25,7 @@ jobs:
       build_container_image: ubuntu:24.04
       test_container_image: ubuntu:24.04
       build_apt_packages: bash build-essential ca-certificates clangd clang-format curl fd-find file git python3 python3-pylsp ripgrep shellcheck unzip xz-utils
-      test_apt_packages: bash ca-certificates fd-find file git python3 ripgrep xz-utils
+      test_apt_packages: bash build-essential ca-certificates fd-find file git python3 ripgrep xz-utils
       output_dir: .nvim-portable/out
       test_install_root: /opt/nvim-bundle-test
       required_bundle_paths: |
