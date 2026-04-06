@@ -3,8 +3,8 @@
 !*.md
 !LICENSE
 !vimrc*
-!docker/
-!docker/**
+!nvim/
+!nvim/**
 !lecture/
 !docs/
 !assets/
@@ -17,5 +17,3 @@
 !.github/**
 !/src
 !*.pdf
-docker/out/
-docker/**/*.old.*
