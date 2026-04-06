@@ -79,10 +79,29 @@ export XDG_CACHE_HOME="$BUNDLE_ROOT/xdg/cache"
 export NVIM_APPNAME="nvim"
 export PATH="$BUNDLE_ROOT/nvim/bin:$PATH"
 
+declare -a REQUIRED_PARSERS=(lua vim vimdoc query bash)
+
+parser_present() {
+  local parser=$1
+
+  [[ -f "$XDG_DATA_HOME/nvim/lazy/nvim-treesitter/parser/$parser.so" \
+      || -f "$XDG_DATA_HOME/nvim/site/parser/$parser.so" \
+      || -f "$BUNDLE_ROOT/nvim/lib/nvim/parser/$parser.so" ]]
+}
+
 export MYVIM_BOOTSTRAP=1
 "$BUNDLE_ROOT/run.sh" --headless "+Lazy! sync" +qa
 unset MYVIM_BOOTSTRAP
-"$BUNDLE_ROOT/run.sh" --headless "+TSInstallSync lua vim vimdoc query bash" +qa
+
+for parser in "${REQUIRED_PARSERS[@]}"; do
+  if parser_present "$parser"; then
+    printf 'Treesitter parser already present: %s\n' "$parser"
+    continue
+  fi
+
+  printf 'Installing Treesitter parser: %s\n' "$parser"
+  "$BUNDLE_ROOT/run.sh" --headless "+TSInstallSync! $parser" +qa
+done
 
 declare -a REQUIRED_PLUGIN_DIRS=(
   "Comment.nvim"
@@ -133,12 +152,9 @@ if (( ${#MISSING_PLUGIN_DIRS[@]} > 0 )); then
   exit 1
 fi
 
-declare -a REQUIRED_PARSERS=(lua vim vimdoc query bash)
 declare -a MISSING_PARSERS=()
 for parser in "${REQUIRED_PARSERS[@]}"; do
-  if [[ ! -f "$XDG_DATA_HOME/nvim/lazy/nvim-treesitter/parser/$parser.so" \
-        && ! -f "$XDG_DATA_HOME/nvim/site/parser/$parser.so" \
-        && ! -f "$BUNDLE_ROOT/nvim/lib/nvim/parser/$parser.so" ]]; then
+  if ! parser_present "$parser"; then
     MISSING_PARSERS+=("$parser")
   fi
 done
