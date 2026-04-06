@@ -10,11 +10,3 @@ fi
 export MYVIM_BOOTSTRAP=1
 "$BUNDLE_RUN" --headless "+Lazy! sync" +qa
 unset MYVIM_BOOTSTRAP
-
-for parser in lua vim vimdoc query bash; do
-  if [[ -f "$XDG_DATA_HOME/$NVIM_APPNAME/lazy/nvim-treesitter/parser/$parser.so" ]] || [[ -f "$XDG_DATA_HOME/$NVIM_APPNAME/site/parser/$parser.so" ]] || [[ -f "$BUNDLE_ROOT/nvim/lib/nvim/parser/$parser.so" ]]; then
-    continue
-  fi
-
-  "$BUNDLE_RUN" --headless "+TSInstallSync! $parser" +qa
-done
