@@ -13,6 +13,8 @@ jobs:
     uses: zzjc1234/nvim-portable/.github/workflows/neovim-bundle.yml@main
     with:
       config_path: docker
+      infra_repository: zzjc1234/nvim-portable
+      infra_ref: main
       bootstrap_script: .github/nvim/bootstrap.sh
       smoke_script: .github/nvim/smoke.sh
       verify_script: .github/nvim/verify.sh
