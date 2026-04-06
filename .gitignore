@@ -17,3 +17,5 @@
 !.github/**
 !/src
 !*.pdf
+docker/out/
+docker/**/*.old.*

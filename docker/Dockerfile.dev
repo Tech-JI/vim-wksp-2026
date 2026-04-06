@@ -1,0 +1,26 @@
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    TZ=Etc/UTC \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    bash \
+    build-essential \
+    ca-certificates \
+    clangd \
+    clang-format \
+    curl \
+    fd-find \
+    file \
+    git \
+    python3 \
+    python3-pylsp \
+    ripgrep \
+    shellcheck \
+    unzip \
+    xz-utils \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /workspace
