@@ -1,0 +1,93 @@
+name: build-neovim-bundle
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: build-${{ matrix.id }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: linux-x64
+            runner: ubuntu-24.04
+            target_arch: amd64
+            artifact_name: nvim-bundle-linux-x86_64
+            artifact_file: nvim-bundle-linux-x86_64.tar.gz
+          - id: linux-arm64
+            runner: ubuntu-24.04-arm
+            target_arch: arm64
+            artifact_name: nvim-bundle-linux-arm64
+            artifact_file: nvim-bundle-linux-arm64.tar.gz
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build bundle
+        env:
+          TARGET_ARCH: ${{ matrix.target_arch }}
+        run: bash docker/scripts/build-bundle.sh
+
+      - name: Smoke test built bundle
+        run: bash docker/scripts/smoke-bundle.sh "$GITHUB_WORKSPACE/docker/out/nvim-bundle"
+
+      - name: Package bundle
+        env:
+          TARGET_ARCH: ${{ matrix.target_arch }}
+        run: bash docker/scripts/package-bundle.sh
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ github.workspace }}/docker/out/${{ matrix.artifact_file }}
+          if-no-files-found: error
+
+  verify:
+    name: verify-${{ matrix.id }}
+    needs: build
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: linux-x64
+            runner: ubuntu-24.04
+            target_arch: amd64
+            artifact_name: nvim-bundle-linux-x86_64
+            artifact_file: nvim-bundle-linux-x86_64.tar.gz
+          - id: linux-arm64
+            runner: ubuntu-24.04-arm
+            target_arch: arm64
+            artifact_name: nvim-bundle-linux-arm64
+            artifact_file: nvim-bundle-linux-arm64.tar.gz
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download package artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ runner.temp }}/bundle
+
+      - name: Verify artifact in fresh Ubuntu container
+        env:
+          TARGET_ARCH: ${{ matrix.target_arch }}
+          ARTIFACT_PATH: ${{ runner.temp }}/bundle/${{ matrix.artifact_file }}
+        run: bash docker/scripts/test-bundle.sh
+
+      - name: Note local interactive reproduction
+        run: |
+          printf '%s\n' 'GitHub Actions cannot provide a persistent interactive shell after the job ends.'
+          printf '%s\n' 'Reproduce locally with the same artifact and image:'
+          printf '  TARGET_ARCH=%s ARTIFACT_PATH="%s" bash docker/scripts/enter-test.sh\n' "${{ matrix.target_arch }}" "${{ runner.temp }}/bundle/${{ matrix.artifact_file }}"
