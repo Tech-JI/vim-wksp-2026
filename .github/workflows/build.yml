@@ -9,85 +9,61 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    name: build-${{ matrix.id }}
-    runs-on: ${{ matrix.runner }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - id: linux-x64
-            runner: ubuntu-24.04
-            target_arch: amd64
-            artifact_name: nvim-bundle-linux-x86_64
-            artifact_file: nvim-bundle-linux-x86_64.tar.gz
-          - id: linux-arm64
-            runner: ubuntu-24.04-arm
-            target_arch: arm64
-            artifact_name: nvim-bundle-linux-arm64
-            artifact_file: nvim-bundle-linux-arm64.tar.gz
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Build bundle
-        env:
-          TARGET_ARCH: ${{ matrix.target_arch }}
-        run: bash docker/scripts/build-bundle.sh
-
-      - name: Smoke test built bundle
-        run: bash docker/scripts/smoke-bundle.sh "$GITHUB_WORKSPACE/docker/out/nvim-bundle"
-
-      - name: Package bundle
-        env:
-          TARGET_ARCH: ${{ matrix.target_arch }}
-        run: bash docker/scripts/package-bundle.sh
-
-      - name: Upload package artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.artifact_name }}
-          path: ${{ github.workspace }}/docker/out/${{ matrix.artifact_file }}
-          if-no-files-found: error
-
-  verify:
-    name: verify-${{ matrix.id }}
-    needs: build
-    runs-on: ${{ matrix.runner }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - id: linux-x64
-            runner: ubuntu-24.04
-            target_arch: amd64
-            artifact_name: nvim-bundle-linux-x86_64
-            artifact_file: nvim-bundle-linux-x86_64.tar.gz
-          - id: linux-arm64
-            runner: ubuntu-24.04-arm
-            target_arch: arm64
-            artifact_name: nvim-bundle-linux-arm64
-            artifact_file: nvim-bundle-linux-arm64.tar.gz
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Download package artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ matrix.artifact_name }}
-          path: ${{ runner.temp }}/bundle
-
-      - name: Verify artifact in fresh Ubuntu container
-        env:
-          TARGET_ARCH: ${{ matrix.target_arch }}
-          ARTIFACT_PATH: ${{ runner.temp }}/bundle/${{ matrix.artifact_file }}
-        run: bash docker/scripts/test-bundle.sh
-
-      - name: Note local interactive reproduction
-        run: |
-          printf '%s\n' 'GitHub Actions cannot provide a persistent interactive shell after the job ends.'
-          printf '%s\n' 'Reproduce locally with the same artifact and image:'
-          printf '  TARGET_ARCH=%s ARTIFACT_PATH="%s" bash docker/scripts/enter-test.sh\n' "${{ matrix.target_arch }}" "${{ runner.temp }}/bundle/${{ matrix.artifact_file }}"
+  bundle:
+    uses: zzjc1234/nvim-portable/.github/workflows/neovim-bundle.yml@main
+    with:
+      config_path: docker
+      bootstrap_script: .github/nvim/bootstrap.sh
+      smoke_script: .github/nvim/smoke.sh
+      verify_script: .github/nvim/verify.sh
+      bundle_name: nvim-bundle
+      app_name: nvim
+      neovim_version: v0.11.7
+      target_arches: amd64,arm64
+      build_container_image: ubuntu:24.04
+      test_container_image: ubuntu:24.04
+      build_apt_packages: bash build-essential ca-certificates clangd clang-format curl fd-find file git python3 python3-pylsp ripgrep shellcheck unzip xz-utils
+      test_apt_packages: bash ca-certificates fd-find file git python3 ripgrep xz-utils
+      output_dir: .nvim-portable/out
+      test_install_root: /opt/nvim-bundle-test
+      required_bundle_paths: |
+        xdg/data/nvim/lazy/Comment.nvim
+        xdg/data/nvim/lazy/bufferline.nvim
+        xdg/data/nvim/lazy/cmp-buffer
+        xdg/data/nvim/lazy/cmp-cmdline
+        xdg/data/nvim/lazy/cmp-dictionary
+        xdg/data/nvim/lazy/cmp-nvim-lsp
+        xdg/data/nvim/lazy/cmp-path
+        xdg/data/nvim/lazy/cmp-vsnip
+        xdg/data/nvim/lazy/flash.nvim
+        xdg/data/nvim/lazy/formatter.nvim
+        xdg/data/nvim/lazy/friendly-snippets
+        xdg/data/nvim/lazy/indent-blankline.nvim
+        xdg/data/nvim/lazy/lazy.nvim
+        xdg/data/nvim/lazy/lspkind-nvim
+        xdg/data/nvim/lazy/lualine.nvim
+        xdg/data/nvim/lazy/nvim-autopairs
+        xdg/data/nvim/lazy/nvim-cmp
+        xdg/data/nvim/lazy/nvim-lint
+        xdg/data/nvim/lazy/nvim-lspconfig
+        xdg/data/nvim/lazy/nvim-tree.lua
+        xdg/data/nvim/lazy/nvim-treesitter
+        xdg/data/nvim/lazy/nvim-treesitter-textobjects
+        xdg/data/nvim/lazy/nvim-web-devicons
+        xdg/data/nvim/lazy/outline.nvim
+        xdg/data/nvim/lazy/plenary.nvim
+        xdg/data/nvim/lazy/snacks.nvim
+        xdg/data/nvim/lazy/telescope-zoxide
+        xdg/data/nvim/lazy/telescope.nvim
+        xdg/data/nvim/lazy/todo-comments.nvim
+        xdg/data/nvim/lazy/tokyonight.nvim
+        xdg/data/nvim/lazy/trouble.nvim
+        xdg/data/nvim/lazy/vim-snippets
+        xdg/data/nvim/lazy/vim-vsnip
+        xdg/data/nvim/lazy/which-key.nvim
+      required_treesitter_parsers: |
+        lua
+        vim
+        vimdoc
+        query
+        bash
