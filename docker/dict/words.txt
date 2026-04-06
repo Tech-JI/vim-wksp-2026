@@ -1,0 +1,13 @@
+bundle
+clangd
+completion
+config
+docker
+lazy
+lsp
+neovim
+parser
+plugin
+query
+treesitter
+vimdoc
