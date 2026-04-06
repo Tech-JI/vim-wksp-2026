@@ -7,12 +7,16 @@ REPO_ROOT=$(cd "${DOCKER_DIR}/.." && pwd)
 
 IMAGE_NAME=${IMAGE_NAME:-vim-wksp-2026-nvim-bundle-dev}
 CONTAINER_WORKDIR=${CONTAINER_WORKDIR:-/workspace}
+HOST_UID=${HOST_UID:-$(id -u)}
+HOST_GID=${HOST_GID:-$(id -g)}
 
 if [[ "${1:-}" != "--inside" ]]; then
   docker build -f "$DOCKER_DIR/Dockerfile.dev" -t "$IMAGE_NAME" "$REPO_ROOT"
   docker run --rm -t \
     -e TARGET_ARCH="${TARGET_ARCH:-}" \
     -e BUNDLE_OUT="${BUNDLE_OUT:-/workspace/docker/out/nvim-bundle}" \
+    -e HOST_UID="$HOST_UID" \
+    -e HOST_GID="$HOST_GID" \
     -v "$REPO_ROOT":"$CONTAINER_WORKDIR" \
     -w "$CONTAINER_WORKDIR" \
     "$IMAGE_NAME" \
@@ -187,3 +191,7 @@ for path in sorted(root.rglob("*")):
     suffix = "/" if path.is_dir() else ""
     print(f"  {rel}{suffix}")
 PY
+
+if [[ -n "${HOST_UID:-}" && -n "${HOST_GID:-}" ]]; then
+  chown -R "$HOST_UID:$HOST_GID" "$BUNDLE_ROOT" "$(dirname "$BUNDLE_ROOT")"
+fi
