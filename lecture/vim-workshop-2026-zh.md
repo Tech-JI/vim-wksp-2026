@@ -38,9 +38,7 @@ brew install neovim
 
 ```sh
 sudo apt update
-sudo apt install vim neovim
-```
-```
+sudo apt install vim Neovim
 ```
 
 ### 1.4 Arch Linux
@@ -538,7 +536,7 @@ Vim 的正则有 magic 规则，很多符号什么时候需要转义，和常见
 | 行尾 | `$` | `$` | `$` | `\$` |
 | 重复前一个 atom 0 次或多次 | `*` | `*` | `\*` | `\*` |
 | 分组 | `()` | `\(\)` | `\(\)` | `\(\)` |
-| 或 | <code>&#124;</code> | `\|` | `\|` | `\|` |
+| 或 | <code>&#124;</code> | <code>\&#124;</code> | <code>\&#124;</code> | <code>\&#124;</code> |
 | 字面量反斜杠 | `\\` | `\\` | `\\` | `\\` |
 | 字面量 `{` | `\{` | `{` | `{` | `{` |
 
