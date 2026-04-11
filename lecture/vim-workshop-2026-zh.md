@@ -104,7 +104,6 @@ Vim 是 modal editor，也就是“有模式的编辑器”。
 | Visual | 选择文本 |
 | Command-line | 执行 `:w`、`:q`、`/pattern` 等命令 |
 
-最重要的习惯：
 
 Normal mode 是默认状态。
 
