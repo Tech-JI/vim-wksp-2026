@@ -321,15 +321,20 @@ Text object 表示一个有意义的文本范围。
 | `aw` | 一个 word，通常包含周围空格 |
 | `iW` | 当前 WORD 内部 |
 | `aW` | 一个 WORD，通常包含周围空格 |
-| `i"` | 引号内部 |
-| `a"` | 一对引号，包含引号本身 |
+| `ip` | 当前段落内部 |
+| `ap` | 当前段落,通常包含段落后空行 |
+| `iP` | 当前块落内部 |
+| `aP` | 当前段落,通常包含周围空行 |
+| `i"` | 双引号内部 |
+| `a"` | 一对双引号，包含引号本身 |
+| `i'` | 单引号内部 |
+| `a'` | 一对单引号，包含引号本身 |
 | `i(` | 圆括号内部 |
 | `a(` | 一对圆括号，包含括号本身 |
 | `i[` | 方括号内部 |
 | `a[` | 一对方括号，包含括号本身 |
 | `i{` | 花括号内部 |
 | `a{` | 一对花括号，包含括号本身 |
-
 常用组合：
 
 | 命令 | 含义 |
@@ -383,7 +388,15 @@ ci(
 
 ## 8. 缩进和格式化
 
-缩进命令：
+`=` / `gq` / `gw`：可以和 motion 或 text object 组合。
+
+| 命令 | 类型 | 含义 |
+| --- | --- | --- |
+| `=` | operator | 按 Vim 的缩进规则重新计算缩进 |
+| `gq` | operator | 格式化文本，主要处理自然语言段落的换行 |
+| `gw` | operator | 类似 `gq`，但尽量保持光标位置 |
+
+
 
 | 命令 | 含义 |
 | --- | --- |
@@ -391,18 +404,55 @@ ci(
 | `<<` | 当前行向左缩进 |
 | `>` | Visual mode 中选区向右缩进 |
 | `<` | Visual mode 中选区向左缩进 |
-| `=motion` | 按 Vim 的缩进规则重新缩进一段 |
+| `==` | 重新缩进当前行 |
+| `=ap` | 重新缩进当前段落 |
+| `=i{` | 重新缩进当前花括号内部 |
 | `gg=G` | 重新缩进整个文件 |
-
-格式化文本：
-
-| 命令 | 含义 |
-| --- | --- |
 | `gqmotion` | 格式化一段文本 |
 | `gqap` | 格式化当前段落 |
-| `gw` | 类似 `gq`，但尽量保持光标位置 |
+| `gwap` | 类似 `gqap`，但尽量保持光标位置 |
 
-注意：`=` 主要处理缩进；`gq` 主要处理文本换行。代码格式化通常还需要 LSP、formatter 插件或外部工具。
+代码格式化通常还需要 LSP、formatter 插件或外部工具。这里的 `=` 只负责 Vim 能识别的缩进规则。
+
+缩进练习：
+
+```txt
+function demo() {
+console.log("hello")
+if (true) {
+console.log("world")
+}
+}
+```
+
+尝试：
+
+```vim
+==
+=i{
+=ap
+```
+
+观察：
+
+- `==` 只处理当前行。
+- `=i{` 处理当前 `{}` 内部，不包括 `{}` 本身。
+- `=ap` 处理当前段落。
+
+格式化练习：
+
+```txt
+Vim is a modal editor. It separates moving, selecting, changing, and inserting text. This makes many editing operations composable, but it also means beginners need to practice Normal mode deliberately.
+```
+
+把光标放在这一段里，尝试：
+
+```vim
+gqap
+gwap
+```
+
+观察 `gqap` 和 `gwap` 的效果是否相同，以及光标位置是否变化。
 
 ---
 
