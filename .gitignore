@@ -1,0 +1,17 @@
+*
+!.gitignore
+!*.md
+!LICENSE
+!vimrc*
+!docker/
+!docker/**
+!lecture/
+!docs/
+!assets/
+!assets/demo.gif
+!*.lua
+!*.sh
+!Dockerfile*
+!.luarc.json
+!/src
+!*.pdf
