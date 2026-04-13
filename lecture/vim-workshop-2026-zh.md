@@ -38,7 +38,7 @@ brew install neovim
 
 ```sh
 sudo apt update
-sudo apt install vim Neovim
+sudo apt install vim neovim
 ```
 
 ### 1.4 Arch Linux
@@ -62,6 +62,13 @@ winget install vim.vim
 ```
 
 如果使用 WSL，也需要在 WSL 的 Linux 环境里单独安装 Vim 或 Neovim。
+
+练习：
+
+1. 在终端确认 `vim --version` 或 `nvim --version` 能正常输出。
+2. 启动 Vim 或 Neovim。
+3. 输入 `:q` 退出。
+4. 再启动一次，输入 `:help` 打开帮助，然后用 `:q` 关闭帮助窗口。
 
 ---
 
@@ -119,6 +126,13 @@ Vim 文档和配置里常用尖括号表示特殊按键或组合键：
 
 大写字母通常直接写成 `A`，表示 Shift + a，不常写成 `<S-a>`。
 
+练习：
+
+1. 在 Normal mode 按 `i` 进入 Insert mode。
+2. 输入一行文字。
+3. 按 `<Esc>` 回到 Normal mode。
+4. 输入 `:set showmode`，再重复进入和离开 Insert mode，观察状态栏变化。
+
 ---
 
 ## 4. 进入和离开 Insert Mode
@@ -126,8 +140,8 @@ Vim 文档和配置里常用尖括号表示特殊按键或组合键：
 | 按键 | 含义 |
 | --- | --- |
 | `i` | 在光标前插入 |
-| `a` | 在光标后追加 |
 | `I` | 在当前行第一个非空白字符前插入 |
+| `a` | 在光标后追加 |
 | `A` | 在行尾追加 |
 | `o` | 在下方新开一行 |
 | `O` | 在上方新开一行 |
@@ -144,7 +158,7 @@ Vim 文档和配置里常用尖括号表示特殊按键或组合键：
 
 | 命令 | 含义 |
 | --- | --- |
-| `cw` | 修改到下一个 word |
+| `cw` | 修改当前 word 从光标开始的部分 |
 | `c$` | 修改到行尾 |
 | `ciw` | 修改当前 word |
 | `ct,` | 修改到下一个逗号之前 |
@@ -163,17 +177,14 @@ Insert mode 中常用：
 hello_world
 ```
 
-把它改成：
+把光标放在行首，分别练习：
 
-```txt
-say_hello_world!
-```
-
-再尝试：
-
-1. 用 `s` 替换一个字符。
-2. 用 `C` 修改从光标到行尾的内容。
-3. 用 `ciw` 修改当前 word。
+1. 按 `I`，输入 `say_`，按 `<Esc>`，得到 `say_hello_world`。
+2. 按 `A`，输入 `!`，按 `<Esc>`，得到 `say_hello_world!`。
+3. 把光标移到 `world` 的 `w` 上，按 `ciw`，输入 `Vim`，再按 `<Esc>`，得到 `say_hello_Vim!`。
+4. 按 `u` 撤销，再按 `<C-r>` 重做。
+5. 把光标移到任意字符上，按 `s` 替换一个字符。
+6. 把光标移到 `hello` 的 `h` 上，按 `C` 修改到行尾。
 
 ---
 
@@ -208,10 +219,15 @@ say_hello_world!
 练习：
 
 ```txt
-foo.bar+baz hello_world
+foo.bar+baz hello_world /tmp/example.txt
 ```
 
-分别用 `w` 和 `W` 从行首移动，观察停下的位置。
+把光标放在行首，尝试：
+
+1. 连续按 `w`，观察 `foo`、`.`、`bar`、`+`、`baz` 会被当成不同 word。
+2. 回到行首，连续按 `W`，观察 `foo.bar+baz` 会被当成一个 WORD。
+3. 用 `e` 移到当前或下一个 word 的末尾。
+4. 用 `b` 向前回到上一个 word 的开头。
 
 ### 5.3 行内查找字符
 
@@ -230,7 +246,13 @@ foo.bar+baz hello_world
 alpha, beta, gamma
 ```
 
-尝试 `f,`、`;`、`t,`，观察光标停在哪里。
+把光标放在行首，尝试：
+
+1. 按 `f,` 跳到第一个逗号。
+2. 按 `;` 跳到下一个逗号。
+3. 按 `,` 回到上一个逗号。
+4. 回到行首，按 `t,` 停在第一个逗号前。
+5. 把光标放在行尾，按 `F,` 向左找逗号。
 
 ### 5.4 行内和文件移动
 
@@ -241,7 +263,7 @@ alpha, beta, gamma
 | `$` | 行尾 |
 | `gg` | 文件第一行 |
 | `G` | 文件最后一行 |
-| `42G` | 跳到第 42 行 |
+| `{n}G` | 跳到第 n 行，例如 `42G` |
 | `<C-d>` | 向下半页 |
 | `<C-u>` | 向上半页 |
 
@@ -265,11 +287,33 @@ alpha, beta, gamma
 | `}` | 跳到下一段 |
 | `(` | 跳到上一句 |
 | `)` | 跳到下一句 |
-| `[` | 跳到上一个结构 |
-| `]` | 跳到下一个结构 |
+| `[[` | 跳到上一个 section |
+| `]]` | 跳到下一个 section |
 | `%` | 在匹配的括号之间跳转 |
 
-`[` 和 `]` 在不同语言、插件或 LSP 环境里可能有不同含义，具体行为依上下文和 filetype 而定。
+`[` 和 `]` 也是一组 bracket commands 的前缀。在不同语言、插件或 LSP 环境里可能有不同含义，具体行为依上下文和 filetype 而定。
+
+综合练习：
+
+```txt
+first line
+
+alpha beta gamma
+
+if (ready) {
+  call(value)
+}
+
+last line
+```
+
+尝试：
+
+1. 用 `gg` 跳到文件开头，再用 `G` 跳到文件末尾。
+2. 用 `0`、`^`、`$` 在同一行内移动。
+3. 用 `{` 和 `}` 在空行分隔的段落之间跳转。
+4. 把光标放在括号上，用 `%` 在匹配括号之间跳转。
+5. 滚动半页后按 `zz`，观察当前行在屏幕中的位置。
 
 ---
 
@@ -321,9 +365,7 @@ Text object 表示一个有意义的文本范围。
 | `iW` | 当前 WORD 内部 |
 | `aW` | 一个 WORD，通常包含周围空格 |
 | `ip` | 当前段落内部 |
-| `ap` | 当前段落,通常包含段落后空行 |
-| `iP` | 当前块落内部 |
-| `aP` | 当前段落,通常包含周围空行 |
+| `ap` | 当前段落，通常包含段落后空行 |
 | `i"` | 双引号内部 |
 | `a"` | 一对双引号，包含引号本身 |
 | `i'` | 单引号内部 |
@@ -353,16 +395,13 @@ Text object 表示一个有意义的文本范围。
 call(foo_bar, "hello world", { x: 1, y: 2 })
 ```
 
-尝试：
+每次练习前可以按 `u` 撤销，或者重新复制这一行。尝试：
 
-```txt
-diw
-ciw
-daw
-diW
-di"
-ci(
-```
+1. 把光标放在 `foo_bar` 中间，按 `diw` 删除 `foo_bar`。
+2. 把光标放在 `foo_bar` 中间，按 `ciw`，输入 `name`，再按 `<Esc>` 改成 `name`。
+3. 把光标放在 `"hello world"` 里面，按 `di"` 删除引号内部。
+4. 把光标放在圆括号内部，按 `ci(`，输入 `new_value`，再按 `<Esc>` 修改参数列表。
+5. 把光标放在 `{ x: 1, y: 2 }` 内部，按 `di{` 删除花括号内部。
 
 ---
 
@@ -381,9 +420,20 @@ ci(
 
 练习：
 
-1. 用 `ciw` 修改一个 word。
-2. 移动到另一个类似 word。
-3. 按 `.` 重复刚才的修改。
+```txt
+status: pending
+status: pending
+status: pending
+```
+
+尝试：
+
+1. 把光标放在第一行的 `pending` 上。
+2. 按 `ciw`，输入 `done`，再按 `<Esc>` 把它改成 `done`。
+3. 移动到下一行的 `pending` 上。
+4. 按 `.` 重复刚才的修改。
+5. 再移动到第三行，继续按 `.`。
+6. 用 `u` 撤销一次，再用 `<C-r>` 重做。
 
 ---
 
@@ -409,7 +459,7 @@ ci(
 | `=ap` | 重新缩进当前段落 |
 | `=i{` | 重新缩进当前花括号内部 |
 | `gg=G` | 重新缩进整个文件 |
-| `gqmotion` | 格式化一段文本 |
+| `gq{motion}` | 格式化一段文本 |
 | `gqap` | 格式化当前段落 |
 | `gwap` | 类似 `gqap`，但尽量保持光标位置 |
 
@@ -417,16 +467,17 @@ ci(
 
 缩进练习：
 
-```txt
-function demo() {
-console.log("hello")
+```c
+void demo() {
+printf("hello ");
 if (true) {
-console.log("world")
+printf("world");
 }
+printf("\n");
 }
 ```
 
-尝试：
+把光标放在函数内部尝试：
 
 ```vim
 ==
@@ -439,15 +490,16 @@ console.log("world")
 - `==` 只处理当前行。
 - `=i{` 处理当前 `{}` 内部，不包括 `{}` 本身。
 - `=ap` 处理当前段落。
+- `gg=G` 可以重新缩进整个文件。
 
 格式化练习：
-
 ```txt
+
 Vim is a modal editor. It separates moving, selecting, changing, and inserting text. This makes many editing operations composable, but it also means beginners need to practice Normal mode deliberately.
+
 ```
 
 把光标放在这一段里，尝试：
-
 ```vim
 gqap
 gwap
@@ -493,6 +545,22 @@ set clipboard=unnamedplus
 
 所以遇到剪贴板问题时，不要只检查 Vim 配置，也要检查终端和 tmux。
 
+练习：
+
+```txt
+copy this line
+paste below
+system clipboard test
+```
+
+尝试：
+
+1. 用 `yy` 复制第一行，用 `p` 粘贴到下一行。
+2. 用 `dd` 删除一行，再用 `p` 粘贴回来。
+3. 如果本机剪贴板可用，选中一段文本后用 `"+y` 复制到系统剪贴板。
+4. 在 Vim 外部粘贴，确认系统剪贴板是否生效。
+5. 如果失败，用 `:checkhealth` 或 `:version` 检查剪贴板支持。
+
 ---
 
 ## 10. 搜索和替换
@@ -517,6 +585,21 @@ set clipboard=unnamedplus
 | `N` | 沿当前搜索方向找上一个匹配 |
 | `*` | 向文件后方搜索光标下的 word |
 | `#` | 向文件前方搜索光标下的 word |
+
+搜索练习：
+
+```txt
+apple banana apple
+pear apple grape
+banana pear apple
+```
+
+尝试：
+
+1. 用 `/apple` 搜索 `apple`。
+2. 用 `n` 找下一个匹配，用 `N` 反方向找。
+3. 把光标放在 `banana` 上，按 `*` 搜索同一个 word。
+4. 用 `?pear` 反向搜索 `pear`。
 
 ### 10.1 Jump List
 
@@ -545,6 +628,8 @@ Mark 用来手动记录位置：
 2. 用 `/pattern` 或 `G` 跳到别处。
 3. 按 `` `a `` 回到刚才的位置。
 
+### 10.3 Substitute
+
 替换全文：
 
 ```vim
@@ -557,13 +642,29 @@ Mark 用来手动记录位置：
 :%s/old/new/gc
 ```
 
-替换第 1 到第 10 行：
+替换当前文件第 1 到第 10 行：
 
 ```vim
 :1,10s/old/new/g
 ```
 
-### 10.3 Magic
+练习：
+
+```txt
+red apple
+red banana
+green apple
+red grape
+```
+
+尝试：
+
+1. 用 `:%s/red/blue/g` 把所有 `red` 改成 `blue`。
+2. 用 `u` 撤销。
+3. 用 `:%s/red/blue/gc` 逐个确认替换。
+4. 只替换前两行：把光标放到第一行，按 `Vj` 选中两行，再输入 `:s/red/yellow/g`。
+
+### 10.4 Magic
 
 Vim 的正则有 magic 规则，很多符号什么时候需要转义，和常见正则不完全一样。
 
@@ -607,8 +708,28 @@ Vim 的正则有 magic 规则，很多符号什么时候需要转义，和常见
 
 练习：
 
-1. 用 `/\v\d+` 搜索一个或多个数字。
-2. 用 `/\Va.b*c` 按字面量搜索 `a.b*c`。
+```txt
+foo
+bar
+foo.bar
+fooXbar
+a.b*c
+item-42
+item-108
+call(foo)
+call(bar)
+call(baz)
+```
+
+尝试：
+
+1. 用 `/foo.bar` 搜索，观察它会匹配 `foo.bar` 和 `fooXbar`。
+2. 用 `/\Vfoo.bar` 搜索，只匹配字面量 `foo.bar`。
+3. 用 `/\Va.b*c` 搜索字面量 `a.b*c`。
+4. 用 `/\v(foo|bar)` 搜索 `foo` 或 `bar`。
+5. 用 `/\vitem-\d+` 搜索 `item-42` 和 `item-108`。
+6. 用 `/\vcall\((foo|bar)\)` 搜索 `call(foo)` 或 `call(bar)`，不匹配 `call(baz)`。
+7. 用 `:%s/\vitem-(\d+)/item #\1/g` 把 `item-42` 改成 `item #42`。
 
 ---
 
@@ -642,6 +763,14 @@ Vim 的正则有 magic 规则，很多符号什么时候需要转义，和常见
 :r! pwd
 ```
 
+练习：
+
+1. 新建一个临时文件，输入几行文字。
+2. 用 `:w /tmp/vim-workshop-test.txt` 保存。
+3. 用 `:e /tmp/vim-workshop-test.txt` 重新打开。
+4. 输入一行新内容，再用 `:e!` 丢弃未保存修改。
+5. 用 `:help motion` 打开帮助，再用 `<C-w>h` 或 `<C-w>j` 回到原窗口。
+
 ---
 
 ## 12. 分屏、Buffer 和 Tab
@@ -671,6 +800,16 @@ Vim 的正则有 magic 规则，很多符号什么时候需要转义，和常见
 - window：显示 buffer 的视图
 - tab：一组 window 的布局，不等于“一个文件一个标签页”
 
+练习：
+
+1. 用 `:e file-a.txt` 打开一个新文件。
+2. 用 `:vs file-b.txt` 打开垂直分屏。
+3. 用 `<C-w>h` 和 `<C-w>l` 在两个窗口之间切换。
+4. 在两个窗口中分别输入不同内容。
+5. 用 `<C-w>=` 平均分配窗口大小。
+6. 用 `:q` 关闭当前窗口。
+7. 用 `:ls` 查看当前 buffer 列表。
+
 ---
 
 ## 13. Visual Mode
@@ -692,6 +831,20 @@ Vim 的正则有 magic 规则，很多符号什么时候需要转义，和常见
 | `>` | 向右缩进 |
 | `<` | 向左缩进 |
 | `o` | 在选区两端切换光标 |
+
+选中区域后按 `:`，命令行会自动出现：
+
+```vim
+:'<,'>
+```
+
+这表示“刚才选中的范围”。例如选中几行后输入：
+
+```vim
+:'<,'>s/old/new/g
+```
+
+就只会在选区里替换。
 
 Visual block 常用于：
 
@@ -719,11 +872,19 @@ line4
 
 步骤：
 
-1. 按 `<C-v>`。
-2. 选中四行第一列。
-3. 按 `I`。
-4. 输入 `# `。
-5. 按 `<Esc>`。
+1. 把光标放在第一行的 `l` 上。
+2. 按 `<C-v>`。
+3. 按 `j` 三次，选中四行第一列。
+4. 按 `I`。
+5. 输入 `# `。
+6. 按 `<Esc>`，等待 Vim 把插入内容应用到所有选中行。
+
+再练习一次，把 `# ` 删除：
+
+1. 把光标放在第一行的 `#` 上。
+2. 按 `<C-v>`。
+3. 按 `j` 三次，再按 `l` 选中两列。
+4. 按 `d` 删除选区。
 
 ---
 
@@ -762,6 +923,16 @@ fruit: banana
 fruit: orange
 ```
 
+步骤：
+
+1. 把光标放在第一行开头。
+2. 按 `qa` 开始录制到寄存器 `a`。
+3. 按 `Ifruit: ` 在行首插入前缀。
+4. 按 `<Esc>` 回到 Normal mode。
+5. 按 `j` 移到下一行。
+6. 按 `q` 停止录制。
+7. 按 `2@a` 对剩下两行重复 macro。
+
 ---
 
 ## 15. 课后继续学习
@@ -776,3 +947,4 @@ fruit: orange
 6. 学习插件和 Neovim Lua。
 
 推荐插件在 [plugin.md](./plugin.md) 。
+
