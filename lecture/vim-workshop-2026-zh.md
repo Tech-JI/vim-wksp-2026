@@ -63,13 +63,6 @@ winget install vim.vim
 
 如果使用 WSL，也需要在 WSL 的 Linux 环境里单独安装 Vim 或 Neovim。
 
-练习：
-
-1. 在终端确认 `vim --version` 或 `nvim --version` 能正常输出。
-2. 启动 Vim 或 Neovim。
-3. 输入 `:q` 退出。
-4. 再启动一次，输入 `:help` 打开帮助，然后用 `:q` 关闭帮助窗口。
-
 ---
 
 ## 2. 交互式教程
